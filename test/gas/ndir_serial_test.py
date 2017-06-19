@@ -22,14 +22,14 @@ try:
 
     ser.write(b'\r')                            # clear serial channel
 
-    ser.write(b'+++\r')                         # reset NDIR
-    print(ser.readline())                       # read reset message
+    ser.write(b'+++\r')                         # cmd: reset NDIR
+    print(ser.readline())                       # read message
 
     while True:
-        ser.write(b'N\r')                       # send ppm
-        line =  ser.readline()
+        ser.write(b'N\r')                       # cmd: send ppm
+        line =  ser.readline()                  # read message
 
-        datum = line.decode().strip()
+        datum = float(line.decode().strip())
         print(datum)
 
         time.sleep(2)
