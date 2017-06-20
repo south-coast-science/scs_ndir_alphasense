@@ -9,6 +9,7 @@ import serial
 from serial.serialutil import SerialException
 
 from scs_core.gas.co2_datum import CO2Datum
+from scs_core.gas.ndir_datum import NDIRDatum
 
 from scs_host.lock.lock import Lock
 
@@ -67,13 +68,25 @@ class NDIR(object):
 
 
     # ----------------------------------------------------------------------------------------------------------------
-    # sampling...
+    # reset...
 
     def reset(self):
         line = self.__transact('\r+++')
         datum = line.strip()
 
         return datum
+
+
+    # ----------------------------------------------------------------------------------------------------------------
+    # sampling...
+
+    def sample(self):
+        temp = self.sample_temp()
+        v = self.sample_dc()
+        cnc = self.sample_co2(False)
+        cnc_igl = self.sample_co2(True)
+
+        return NDIRDatum(temp, v, cnc.cnc, cnc_igl.cnc)
 
 
     def sample_co2(self, ideal_gas_law):

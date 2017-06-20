@@ -12,7 +12,6 @@ import sys
 import time
 
 from scs_core.data.json import JSONify
-from scs_core.gas.ndir_datum import NDIRDatum
 
 from scs_host.sys.host import Host
 
@@ -32,12 +31,7 @@ time.sleep(NDIR.RESET_QUARANTINE)
 
 
 while True:
-    temp = ndir.sample_temp()
-    v = ndir.sample_dc()
-    cnc = ndir.sample_co2(False)
-    cnc_igl = ndir.sample_co2(True)
-
-    sample = NDIRDatum(temp, v, cnc.cnc, cnc_igl.cnc)
+    sample = ndir.sample()
 
     print(JSONify.dumps(sample))
     sys.stdout.flush()
