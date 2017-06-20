@@ -2,6 +2,8 @@
 Created on 19 Jun 2017
 
 @author: Bruno Beloff (bruno.beloff@southcoastscience.com)
+
+https://books.google.co.uk/books?id=RFLtu4fej00C&pg=PA381&lpg=PA381&dq=pic+make32+function&source=bl&ots=ntI5qBRdSe&sig=u9Ay-RgoGCHA4PRebslbGqmvZnE&hl=en&sa=X&ved=0ahUKEwjVg83DwszUAhVGJlAKHUGMArAQ6AEIQjAD#v=onepage&q=pic%20make32%20function&f=false
 """
 
 import serial
@@ -22,6 +24,20 @@ class NDIR(object):
     """
 
     RESET_QUARANTINE =          8.0         # time between reset and stable readings
+
+    ADDR_ZERO =                 10          # 16 bit int
+    ADDR_SPAN =                 12          # 16 bit int
+
+    ADDR_DEG_C_OFFSET =         14          # 16 bit int
+    ADDR_DEG_C_GAIN =           16          # 16 bit int
+
+    ADDR_DC_IN_OFFSET =         18          # 16 bit int
+    ADDR_DC_IN_GAIN =           20          # 16 bit int
+
+    ADDR_DAC_OFFSET =           22          # 16 bit int
+    ADDR_DAC_GAIN =             24          # 16 bit int
+
+    ADDR_RANGE =                26          # 8 bit int
 
 
     # ----------------------------------------------------------------------------------------------------------------
@@ -115,7 +131,22 @@ class NDIR(object):
     # ----------------------------------------------------------------------------------------------------------------
     # EEPROM...
 
-    # TODO: implement specific EEPROM parameters
+    def eeprom_read_int8(self, addr):
+        val = int(self.__transact('E%02x' % addr))
+
+        return val
+
+
+    def eeprom_read_int16(self, addr):
+        msb = int(self.__transact('E%02x' % addr))
+        lsb = int(self.__transact('E%02x' % (addr + 1)))
+
+        return (msb << 8) | lsb
+
+
+    def eeprom_read_ieee32(self, addr):
+        # TODO: implement eeprom_read_ieee32
+        pass
 
 
     # ----------------------------------------------------------------------------------------------------------------
