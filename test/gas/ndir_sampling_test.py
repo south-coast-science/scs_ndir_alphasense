@@ -4,8 +4,6 @@
 Created on 20 Jun 2017
 
 @author: Bruno Beloff (bruno.beloff@southcoastscience.com)
-
-https://raspberrypi.stackexchange.com/questions/450/how-can-i-connect-to-a-usb-serial-device
 """
 
 import sys
