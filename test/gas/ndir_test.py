@@ -10,12 +10,14 @@ https://raspberrypi.stackexchange.com/questions/450/how-can-i-connect-to-a-usb-s
 
 import time
 
+from scs_host.sys.host import Host
+
 from scs_ndir.gas.ndir import NDIR
 
 
 # --------------------------------------------------------------------------------------------------------------------
 
-ndir = NDIR('/dev/ttyUSB0')
+ndir = NDIR(Host.ndir_device())
 print(ndir)
 
 datum = ndir.reset()
