@@ -16,6 +16,11 @@ class NDIR(object):
     Alphasense IRC-A1 NDIR CO2 Transmitter board
     """
 
+    RESET_QUARANTINE =          8.0         # time between reset and stable readings
+
+
+    # ----------------------------------------------------------------------------------------------------------------
+
     __BAUD_RATE =               19200
     __SERIAL_TIMEOUT =          2.0
     __LOCK_TIMEOUT =            1.0

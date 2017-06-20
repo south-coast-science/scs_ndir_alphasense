@@ -22,6 +22,10 @@ print(ndir)
 
 datum = ndir.reset()
 print(datum)
+print("-")
+
+time.sleep(NDIR.RESET_QUARANTINE)
+
 
 while True:
     temp = ndir.sample_temp()
