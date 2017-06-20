@@ -26,8 +26,9 @@ class NDIR(object):
     # ----------------------------------------------------------------------------------------------------------------
 
     __BAUD_RATE =               19200
+
     __SERIAL_TIMEOUT =          2.0
-    __LOCK_TIMEOUT =            1.0
+    __LOCK_TIMEOUT =            2.0
 
 
     # ----------------------------------------------------------------------------------------------------------------
@@ -75,8 +76,8 @@ class NDIR(object):
         return datum
 
 
-    def sample_co2(self, corrected):
-        line = self.__transact('G' if corrected else 'N')
+    def sample_co2(self, ideal_gas_law):
+        line = self.__transact('G' if ideal_gas_law else 'N')
         cnc = float(line)
 
         datum = CO2Datum(cnc)

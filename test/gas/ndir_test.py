@@ -8,7 +8,11 @@ Created on 20 Jun 2017
 https://raspberrypi.stackexchange.com/questions/450/how-can-i-connect-to-a-usb-serial-device
 """
 
+import sys
 import time
+
+from scs_core.data.json import JSONify
+from scs_core.gas.ndir_datum import NDIRDatum
 
 from scs_host.sys.host import Host
 
@@ -29,9 +33,13 @@ time.sleep(NDIR.RESET_QUARANTINE)
 
 while True:
     temp = ndir.sample_temp()
-    co2 = ndir.sample_co2(True)
-    dc = ndir.sample_dc()
+    v = ndir.sample_dc()
+    cnc = ndir.sample_co2(False)
+    cnc_igl = ndir.sample_co2(True)
 
-    print("%0.1f  %d  %s" % (temp, dc, co2))
+    sample = NDIRDatum(temp, v, cnc.cnc, cnc_igl.cnc)
+
+    print(JSONify.dumps(sample))
+    sys.stdout.flush()
 
     time.sleep(1)
