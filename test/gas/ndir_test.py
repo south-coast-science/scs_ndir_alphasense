@@ -17,7 +17,7 @@ from scs_ndir.gas.ndir import NDIR
 
 # --------------------------------------------------------------------------------------------------------------------
 
-ndir = NDIR(Host.ndir_device())
+ndir = NDIR.find(Host.ndir_device())
 print(ndir)
 
 datum = ndir.reset()
@@ -32,6 +32,6 @@ while True:
     co2 = ndir.sample_co2(True)
     dc = ndir.sample_dc()
 
-    print("%0.1f  %0.1f  %d" % (temp, co2, dc))
+    print("%0.1f  %d  %s" % (temp, dc, co2))
 
     time.sleep(1)

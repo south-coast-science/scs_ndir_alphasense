@@ -6,6 +6,10 @@ Created on 19 Jun 2017
 
 import serial
 
+from serial.serialutil import SerialException
+
+from scs_core.gas.co2_datum import CO2Datum
+
 from scs_host.lock.lock import Lock
 
 
@@ -40,6 +44,20 @@ class NDIR(object):
 
     # ----------------------------------------------------------------------------------------------------------------
 
+    @classmethod
+    def find(cls, device):
+        try:
+            ndir = NDIR(device)
+            ndir.__transact('')
+
+            return ndir
+
+        except SerialException:
+            return None
+
+
+    # ----------------------------------------------------------------------------------------------------------------
+
     def __init__(self, device):
         """
         Constructor
@@ -59,7 +77,9 @@ class NDIR(object):
 
     def sample_co2(self, corrected):
         line = self.__transact('G' if corrected else 'N')
-        datum = float(line)
+        cnc = float(line)
+
+        datum = CO2Datum(cnc)
 
         return datum
 
