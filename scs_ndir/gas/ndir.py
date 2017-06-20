@@ -162,7 +162,7 @@ class NDIR(object):
             message = command + '\r'
             ser.write(message.encode())
             line = ser.readline()
-
+ 
             return line.decode()
 
         finally:
