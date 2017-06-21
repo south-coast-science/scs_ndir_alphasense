@@ -66,6 +66,13 @@ class NDIR(object):
     # ----------------------------------------------------------------------------------------------------------------
 
     @classmethod
+    def null_datum(cls):
+        return CO2Datum(None)
+
+
+    # ----------------------------------------------------------------------------------------------------------------
+
+    @classmethod
     def obtain_lock(cls):
         Lock.acquire(cls.__name__, NDIR.__LOCK_TIMEOUT)
 
@@ -78,7 +85,7 @@ class NDIR(object):
     # ----------------------------------------------------------------------------------------------------------------
 
     @classmethod
-    def find(cls, device):
+    def find(cls, device):      # TODO: remove find(cls, device)
         try:
             ndir = NDIR(device)
             ndir.__transact('')
