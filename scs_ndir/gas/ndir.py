@@ -2,11 +2,10 @@
 Created on 19 Jun 2017
 
 @author: Bruno Beloff (bruno.beloff@southcoastscience.com)
-
-https://books.google.co.uk/books?id=RFLtu4fej00C&pg=PA381&lpg=PA381&dq=pic+make32+function&source=bl&ots=ntI5qBRdSe&sig=u9Ay-RgoGCHA4PRebslbGqmvZnE&hl=en&sa=X&ved=0ahUKEwjVg83DwszUAhVGJlAKHUGMArAQ6AEIQjAD#v=onepage&q=pic%20make32%20function&f=false
 """
 
 import serial
+import struct
 
 from serial.serialutil import SerialException
 
@@ -25,6 +24,12 @@ class NDIR(object):
 
     RESET_QUARANTINE =          8.0         # time between reset and stable readings
 
+    ADDR_TIME_TO_SAMPLE =        0          # 8 bit int         5mS steps
+    ADDR_TIME_AFTER_SAMPLE =     1          # 8 bit int
+
+    ADDR_COEFF_B =               2          # IEEE 32 bit float
+    ADDR_COEFF_C =               6          # IEEE 32 bit float
+
     ADDR_ZERO =                 10          # 16 bit int
     ADDR_SPAN =                 12          # 16 bit int
 
@@ -39,13 +44,23 @@ class NDIR(object):
 
     ADDR_RANGE =                26          # 8 bit int
 
+    ADDR_THERM_A =              27          # IEEE 32 bit float
+    ADDR_THERM_B =              31          # IEEE 32 bit float
+    ADDR_THERM_C =              35          # IEEE 32 bit float
+    ADDR_THERM_D =              39          # IEEE 32 bit float
+
+    ADDR_ALPHA =                43          # IEEE 32 bit float
+    ADDR_BETA =                 47          # IEEE 32 bit float
+
+    ADDR_T_CAL =                51          # IEEE 32 bit float
+
 
     # ----------------------------------------------------------------------------------------------------------------
 
     __BAUD_RATE =               19200
 
-    __SERIAL_TIMEOUT =          2.0
-    __LOCK_TIMEOUT =            2.0
+    __SERIAL_TIMEOUT =           2.0
+    __LOCK_TIMEOUT =            10.0
 
 
     # ----------------------------------------------------------------------------------------------------------------
@@ -87,8 +102,8 @@ class NDIR(object):
     # reset...
 
     def reset(self):
-        line = self.__transact('\r+++')
-        datum = line.strip()
+        lines = self.__transact('\r+++')
+        datum = lines[0].strip()
 
         return datum
 
@@ -106,8 +121,8 @@ class NDIR(object):
 
 
     def sample_co2(self, ideal_gas_law):
-        line = self.__transact('G' if ideal_gas_law else 'N')
-        cnc = float(line)
+        lines = self.__transact('G' if ideal_gas_law else 'N')
+        cnc = float(lines[0])
 
         datum = CO2Datum(cnc)
 
@@ -115,55 +130,87 @@ class NDIR(object):
 
 
     def sample_temp(self):
-        line = self.__transact('T')
-        datum = float(line)
+        lines = self.__transact('T')
+        datum = float(lines[0])
 
         return datum
 
 
     def sample_dc(self):
-        line = self.__transact('V')
-        datum = int(line)
+        lines = self.__transact('V')
+        datum = int(lines[0])
 
         return datum
 
 
     # ----------------------------------------------------------------------------------------------------------------
-    # EEPROM...
+    # EEPROM write...
+
+    def eeprom_write_int8(self, addr, val8):
+        val = val8 & 0xff
+
+        self.__transact('W%02x%02x' % (addr, val))
+
+
+    def eeprom_write_int16(self, addr, val16):
+        msb = (val16 & 0xff00) >> 8
+        lsb = (val16 & 0x00ff)
+
+        self.__transact('W%02x%02x' % (addr, msb), 'W%02x%02x' % ((addr + 1), lsb))
+
+
+    def eeprom_write_ieee32(self, addr, val32):
+        vals = struct.unpack('BBBB', struct.pack('f', val32))
+
+        self.__transact('W%02x%02x' % (addr, vals[0]), 'W%02x%02x' % ((addr + 1), vals[1]),
+                        'W%02x%02x' % ((addr + 2), vals[2]), 'W%02x%02x' % ((addr + 3), vals[3]))
+
+
+    # ----------------------------------------------------------------------------------------------------------------
+    # EEPROM read...
 
     def eeprom_read_int8(self, addr):
-        val = int(self.__transact('E%02x' % addr))
+        lines = self.__transact('E%02x' % addr)
+        val = int(lines[0])
 
         return val
 
 
     def eeprom_read_int16(self, addr):
-        msb = int(self.__transact('E%02x' % addr))
-        lsb = int(self.__transact('E%02x' % (addr + 1)))
+        lines = self.__transact('E%02x' % addr, 'E%02x' % (addr + 1))
+        vals = [int(line) for line in lines]
 
-        return (msb << 8) | lsb
+        return (vals[0] << 8) | vals[1]
 
 
     def eeprom_read_ieee32(self, addr):
-        # TODO: implement eeprom_read_ieee32
-        pass
+        lines = self.__transact('E%02x' % addr, 'E%02x' % (addr + 1), 'E%02x' % (addr + 2), 'E%02x' % (addr + 3))
+        vals = [int(line) for line in lines]
+
+        packed = struct.unpack('f', struct.pack('BBBB', *vals))
+
+        return packed[0]
 
 
     # ----------------------------------------------------------------------------------------------------------------
 
-    def __transact(self, command):
-        NDIR.obtain_lock()
-
+    def __transact(self, *commands):
         ser = None
+
+        NDIR.obtain_lock()
 
         try:
             ser = serial.Serial(self.__device, NDIR.__BAUD_RATE, timeout=NDIR.__SERIAL_TIMEOUT)
 
-            message = command + '\r'
-            ser.write(message.encode())
-            line = ser.readline()
+            lines = []
+
+            for command in commands:
+                message = command + '\r'
+                ser.write(message.encode("ascii"))
+
+                lines.append(ser.readline().decode("ascii"))
  
-            return line.decode()
+            return lines
 
         finally:
             if ser:
