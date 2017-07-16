@@ -12,7 +12,6 @@ example JSON:
 from collections import OrderedDict
 
 from scs_core.data.json import PersistentJSONable
-
 from scs_ndir.gas.ndir import NDIR
 
 
@@ -33,16 +32,6 @@ class NDIRConf(PersistentJSONable):
     @classmethod
     def load_from_host(cls, host):
         return cls.load_from_file(cls.filename(host))
-
-
-    # ----------------------------------------------------------------------------------------------------------------
-
-    @classmethod
-    def __addr_str(cls, addr):
-        if addr is None:
-            return None
-
-        return "0x%02x" % addr
 
 
     # ----------------------------------------------------------------------------------------------------------------
