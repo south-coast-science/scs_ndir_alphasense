@@ -207,6 +207,7 @@ class NDIR(object):
         NDIR.obtain_lock()
 
         try:
+            #  TODO: use HostSerial instead?
             ser = serial.Serial(self.__device, NDIR.__BAUD_RATE, timeout=NDIR.__SERIAL_TIMEOUT)
 
             lines = []
