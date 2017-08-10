@@ -216,7 +216,7 @@ class NDIR(object):
                 ser.write(message.encode("ascii"))
 
                 lines.append(ser.readline().decode("ascii"))
- 
+
             return lines
 
         finally:
