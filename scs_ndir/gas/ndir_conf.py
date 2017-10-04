@@ -81,4 +81,4 @@ class NDIRConf(PersistentJSONable):
     # ----------------------------------------------------------------------------------------------------------------
 
     def __str__(self, *args, **kwargs):
-        return "NDIRConf:{present:%s}" %  self.present
+        return "NDIRConf:{host:%s, present:%s}" %  (self.host, self.present)
