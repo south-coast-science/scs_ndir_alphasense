@@ -29,11 +29,6 @@ class NDIRConf(PersistentJSONable):
         return host.conf_dir() + cls.__FILENAME
 
 
-    @classmethod
-    def load_from_host(cls, host):
-        return cls.load_from_file(cls.filename(host))
-
-
     # ----------------------------------------------------------------------------------------------------------------
 
     @classmethod
@@ -52,6 +47,8 @@ class NDIRConf(PersistentJSONable):
         """
         Constructor
         """
+        super().__init__()
+
         self.__present = bool(present)
 
 
@@ -62,12 +59,6 @@ class NDIRConf(PersistentJSONable):
             return None
 
         return NDIR(host.ndir_device())
-
-
-    # ----------------------------------------------------------------------------------------------------------------
-
-    def save(self, host):
-        PersistentJSONable.save(self, self.__class__.filename(host))
 
 
     # ----------------------------------------------------------------------------------------------------------------
