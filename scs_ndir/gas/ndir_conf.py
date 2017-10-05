@@ -12,6 +12,7 @@ example JSON:
 from collections import OrderedDict
 
 from scs_core.data.json import PersistentJSONable
+
 from scs_ndir.gas.ndir import NDIR
 
 
@@ -54,7 +55,7 @@ class NDIRConf(PersistentJSONable):
 
     # ----------------------------------------------------------------------------------------------------------------
 
-    def ndir(self, host):
+    def ndir(self, host):            # TODO: remove host
         if not self.present:
             return None
 
