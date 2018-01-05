@@ -18,7 +18,7 @@ from scs_ndir.gas.ndir import NDIR
 
 # --------------------------------------------------------------------------------------------------------------------
 
-ndir = NDIR.find(Host.ndir_device())
+ndir = NDIR.find(Host.ndir_usb_device())
 print(ndir)
 
 datum = ndir.reset()
