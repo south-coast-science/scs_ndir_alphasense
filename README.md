@@ -1,5 +1,5 @@
 # scs_ndir_alphasense
-Environmental sampling abstractions for the Alphasense IRC-A1 NDIR CO2 Transmitter board.
+Environmental sampling abstractions for the Alphasense IRC-A1 NDIR CO2 sensor Transmitter board.
 
 _South Coast Science is currently developing an SPI interface board for the Alphasense IRC-A1 NDIR sensor. The SPI 
 board is intended to replace the Alphasense IRC-A1 NDIR USB Transmitter board in most applications. This code is
