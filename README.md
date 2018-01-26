@@ -7,8 +7,16 @@ no longer supported, but is provided to users who need to develop their own USB 
 
 _See **[scs_ndir](https://github.com/south-coast-science/scs_ndir)** for more information._
 
+
 **Required libraries:** 
 
 * Third party: pyserial
 * SCS root: scs_core
 * SCS host: scs_host_bbe or scs_host_rpi
+
+
+**Branches:**
+
+The stable branch of this repository is master. For deployment purposes, use:
+
+    git clone --branch=master https://github.com/south-coast-science/scs_ndir_alphasense.git
