@@ -120,11 +120,10 @@ class NDIR(object):
 
     def sample(self):
         temp = self.sample_temp()
-        v = self.sample_dc()
         cnc = self.sample_co2(False)
         cnc_igl = self.sample_co2(True)
 
-        return NDIRDatum(temp, v, cnc.cnc, cnc_igl.cnc)
+        return NDIRDatum(temp, cnc.cnc, cnc_igl.cnc)
 
 
     def sample_co2(self, ideal_gas_law):
