@@ -49,10 +49,12 @@ class NDIRConf(AbstractNDIRConf):
 
 
     # ----------------------------------------------------------------------------------------------------------------
-    # abstract NDIRConf implementation...
+    # AbstractNDIRConf implementation...
 
     def ndir(self, host):
         if self.model is None:
             raise ValueError('unknown model: %s' % self.model)
+
+        # TODO: check against a list of supported devices
 
         return TxNDIR(host.ndir_usb_device())
