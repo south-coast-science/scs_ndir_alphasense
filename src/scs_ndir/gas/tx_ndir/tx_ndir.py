@@ -2,25 +2,35 @@
 Created on 19 Jun 2017
 
 @author: Bruno Beloff (bruno.beloff@southcoastscience.com)
+
+Alphasense IRC-A1 NDIR CO2 Transmitter
+810-0001-07 Rev. 2
 """
 
 import serial
 import struct
+import time
 
-from serial.serialutil import SerialException
-
-from scs_core.gas.co2_datum import CO2Datum
+from scs_core.gas.ndir import NDIR
 from scs_core.gas.ndir_datum import NDIRDatum
+from scs_core.gas.ndir_version import NDIRVersion, NDIRTag
 
 from scs_host.lock.lock import Lock
 
 
 # --------------------------------------------------------------------------------------------------------------------
 
-class NDIR(object):
+class TxNDIR(NDIR):
     """
-    Alphasense IRC-A1 NDIR CO2 Transmitter board
     """
+
+    ID =                        'Alphasense IRC-A1 NDIR CO2 Transmitter'
+
+    TAG_DEVICE =                810
+    TAG_API =                   1
+    TAG_PATCH =                 7
+
+    SAMPLE_INTERVAL =           1.0         # seconds between sampling
 
     RESET_QUARANTINE =          8.0         # time between reset and stable readings
 
@@ -67,14 +77,14 @@ class NDIR(object):
 
     @classmethod
     def null_datum(cls):
-        return CO2Datum(None)
+        return NDIRDatum(None, None, None)
 
 
     # ----------------------------------------------------------------------------------------------------------------
 
     @classmethod
     def obtain_lock(cls):
-        Lock.acquire(cls.__name__, NDIR.__LOCK_TIMEOUT)
+        Lock.acquire(cls.__name__, TxNDIR.__LOCK_TIMEOUT)
 
 
     @classmethod
@@ -84,25 +94,38 @@ class NDIR(object):
 
     # ----------------------------------------------------------------------------------------------------------------
 
-    @classmethod
-    def find(cls, device):      # TODO: remove find(cls, device)
-        try:
-            ndir = NDIR(device)
-            ndir.__transact('')
-
-            return ndir
-
-        except SerialException:
-            return None
-
-
-    # ----------------------------------------------------------------------------------------------------------------
-
     def __init__(self, device):
         """
         Constructor
         """
         self.__device = device
+
+
+    # ----------------------------------------------------------------------------------------------------------------
+    # NDIR implementation...
+
+    def power_on(self):
+        pass
+
+
+    def power_off(self):
+        pass
+
+
+    def sample(self):
+        temp = self.sample_temp()
+        cnc = self.sample_co2(False)
+        cnc_igl = self.sample_co2(True)
+
+        return NDIRDatum(temp, cnc, cnc_igl)
+
+
+    def version(self):
+        return NDIRVersion(self.ID, NDIRTag(self.TAG_DEVICE, self.TAG_API, self.TAG_PATCH))
+
+
+    def sample_interval(self):
+        return self.SAMPLE_INTERVAL
 
 
     # ----------------------------------------------------------------------------------------------------------------
@@ -116,23 +139,13 @@ class NDIR(object):
 
 
     # ----------------------------------------------------------------------------------------------------------------
-    # sampling...
-
-    def sample(self):
-        temp = self.sample_temp()
-        cnc = self.sample_co2(False)
-        cnc_igl = self.sample_co2(True)
-
-        return NDIRDatum(temp, cnc.cnc, cnc_igl.cnc)
-
+    # low-level commands...
 
     def sample_co2(self, ideal_gas_law):
         lines = self.__transact('G' if ideal_gas_law else 'N')
         cnc = float(lines[0])
 
-        datum = CO2Datum(cnc)
-
-        return datum
+        return cnc
 
 
     def sample_temp(self):
@@ -147,6 +160,14 @@ class NDIR(object):
         datum = int(lines[0])
 
         return datum
+
+
+    def calibrate(self):
+        self.__transact('D0')
+        time.sleep(0.5)
+
+        self.__transact('D1')
+        time.sleep(0.5)
 
 
     # ----------------------------------------------------------------------------------------------------------------
@@ -203,11 +224,11 @@ class NDIR(object):
     def __transact(self, *commands):
         ser = None
 
-        NDIR.obtain_lock()
+        TxNDIR.obtain_lock()
 
         try:
             #  TODO: use HostSerial instead?
-            ser = serial.Serial(self.__device, NDIR.__BAUD_RATE, timeout=NDIR.__SERIAL_TIMEOUT)
+            ser = serial.Serial(self.__device, TxNDIR.__BAUD_RATE, timeout=TxNDIR.__SERIAL_TIMEOUT)
 
             lines = []
 
@@ -216,6 +237,7 @@ class NDIR(object):
                 ser.write(message.encode("ascii"))
 
                 lines.append(ser.readline().decode("ascii"))
+                # print("lines: %s" % lines)
 
             return lines
 
@@ -223,10 +245,10 @@ class NDIR(object):
             if ser:
                 ser.close()
 
-            NDIR.release_lock()
+            TxNDIR.release_lock()
 
 
     # ----------------------------------------------------------------------------------------------------------------
 
     def __str__(self, *args, **kwargs):
-        return "NDIR:{device:%s}" % self.__device
+        return "TxNDIR:{device:%s}" % self.__device

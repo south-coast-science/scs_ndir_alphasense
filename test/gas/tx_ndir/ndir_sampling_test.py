@@ -13,19 +13,21 @@ from scs_core.data.json import JSONify
 
 from scs_host.sys.host import Host
 
-from scs_ndir.gas.ndir import NDIR
+from scs_ndir.gas.tx_ndir.tx_ndir import TxNDIR
 
 
 # --------------------------------------------------------------------------------------------------------------------
 
-ndir = NDIR.find(Host.ndir_usb_device())
+ndir = TxNDIR(Host.ndir_usb_device())
 print(ndir)
 
 datum = ndir.reset()
 print(datum)
 print("-")
 
-time.sleep(NDIR.RESET_QUARANTINE)
+ndir.calibrate()
+
+time.sleep(TxNDIR.RESET_QUARANTINE)
 
 
 while True:
@@ -34,4 +36,4 @@ while True:
     print(JSONify.dumps(sample))
     sys.stdout.flush()
 
-    time.sleep(1)
+    time.sleep(ndir.sample_interval())
