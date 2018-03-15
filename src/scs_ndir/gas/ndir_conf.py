@@ -12,13 +12,14 @@ example JSON:
 from collections import OrderedDict
 
 from scs_core.data.json import PersistentJSONable
+from scs_core.gas.ndir_conf import NDIRConf as AbstractNDIRConf
 
 from scs_ndir.gas.ndir import NDIR
 
 
 # --------------------------------------------------------------------------------------------------------------------
 
-class NDIRConf(PersistentJSONable):
+class NDIRConf(AbstractNDIRConf):
     """
     classdocs
     """
