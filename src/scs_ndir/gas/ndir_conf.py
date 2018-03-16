@@ -6,28 +6,24 @@ Created on 21 Jun 2017
 specifies whether on not an NDIR is present
 
 example JSON:
-{"present": true}
+{"model": "TxNDIR", "tally": 1}
 """
 
-from collections import OrderedDict
+from scs_core.gas.ndir_conf import NDIRConf as AbstractNDIRConf
 
-from scs_core.data.json import PersistentJSONable
-
-from scs_ndir.gas.ndir import NDIR
+from scs_ndir.gas.tx_ndir.tx_ndir import TxNDIR
 
 
 # --------------------------------------------------------------------------------------------------------------------
 
-class NDIRConf(PersistentJSONable):
+class NDIRConf(AbstractNDIRConf):
     """
     classdocs
     """
 
-    __FILENAME = "ndir_conf.json"
-
     @classmethod
     def filename(cls, host):
-        return host.conf_dir() + cls.__FILENAME
+        return host.conf_dir() + cls._FILENAME
 
 
     # ----------------------------------------------------------------------------------------------------------------
@@ -35,51 +31,30 @@ class NDIRConf(PersistentJSONable):
     @classmethod
     def construct_from_jdict(cls, jdict):
         if not jdict:
-            return NDIRConf(False)
+            return None
 
-        present = jdict.get('present')
+        model = jdict.get('model')
+        tally = jdict.get('tally')
 
-        return NDIRConf(present)
+        return NDIRConf(model, tally)
 
 
     # ----------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, present):
+    def __init__(self, model, tally):
         """
         Constructor
         """
-        super().__init__()
-
-        self.__present = bool(present)
+        super().__init__(model, tally)
 
 
     # ----------------------------------------------------------------------------------------------------------------
+    # AbstractNDIRConf implementation...
 
-    def ndir(self, host):            # TODO: remove host
-        if not self.present:
-            return None
+    def ndir(self, host):
+        if self.model is None:
+            raise ValueError('unknown model: %s' % self.model)
 
-        return NDIR(host.ndir_device())
+        # TODO: check against a list of supported devices
 
-
-    # ----------------------------------------------------------------------------------------------------------------
-
-    @property
-    def present(self):
-        return self.__present
-
-
-    # ----------------------------------------------------------------------------------------------------------------
-
-    def as_json(self):
-        jdict = OrderedDict()
-
-        jdict['present'] = self.present
-
-        return jdict
-
-
-    # ----------------------------------------------------------------------------------------------------------------
-
-    def __str__(self, *args, **kwargs):
-        return "NDIRConf:{present:%s}" %  self.present
+        return TxNDIR(host.ndir_usb_device())
