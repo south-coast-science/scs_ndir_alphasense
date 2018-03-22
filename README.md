@@ -2,9 +2,8 @@
 Environmental sampling abstractions for the Alphasense IRC-A1 NDIR CO2 sensor Transmitter board.
 
 _South Coast Science is currently developing an SPI interface board for the Alphasense IRC-AT thermopile 
-NDIR sensor. The SPI board will in most cases replace the Alphasense IRC-A1 NDIR USB Transmitter board._
-
-_The IRC-A1 NDIR USB Transmitter board code is no longer supported, but is provided to users who need to develop 
+NDIR sensor. The SPI board will in most cases replace the Alphasense IRC-A1 NDIR USB Transmitter board. The IRC-A1 
+NDIR USB Transmitter board code is no longer supported, but is provided to users who need to develop 
 their own USB solution._
 
 _See **[scs_ndir](https://github.com/south-coast-science/scs_ndir)** for more information._
