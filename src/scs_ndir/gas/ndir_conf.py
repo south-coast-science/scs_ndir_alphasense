@@ -11,6 +11,7 @@ example JSON:
 
 from scs_core.gas.ndir_conf import NDIRConf as AbstractNDIRConf
 
+from scs_ndir.gas.ndir_monitor import NDIRMonitor
 from scs_ndir.gas.tx_ndir.tx_ndir import TxNDIR
 
 
@@ -58,3 +59,7 @@ class NDIRConf(AbstractNDIRConf):
         # TODO: check against a list of supported devices
 
         return TxNDIR(host.ndir_usb_device())
+
+
+    def ndir_monitor(self, host):
+        return NDIRMonitor(self.ndir(host), self)
