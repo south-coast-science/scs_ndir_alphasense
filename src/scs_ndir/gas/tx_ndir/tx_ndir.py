@@ -124,7 +124,7 @@ class TxNDIR(NDIR):
         return NDIRVersion(self.ID, NDIRTag(self.TAG_DEVICE, self.TAG_API, self.TAG_PATCH))
 
 
-    def sample_interval(self):
+    def get_sample_interval(self):
         return self.SAMPLE_INTERVAL
 
 
