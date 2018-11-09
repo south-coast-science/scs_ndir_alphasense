@@ -36,4 +36,4 @@ while True:
     print(JSONify.dumps(sample))
     sys.stdout.flush()
 
-    time.sleep(ndir.sample_interval())
+    time.sleep(ndir.get_sample_interval())
